@@ -1,5 +1,7 @@
 ---
 # Basic CloudForamtion template with only resources section. Windows AMI being used.
+# Here every attribute is hardcoded. So, when using this template in your account, please change the value of KeyName to one of keys available in your aws account
+
 Description: This template will launch EC2 instance on t2.micro arch
 Resources:
   Lab4Instance:
