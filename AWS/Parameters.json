@@ -1,0 +1,36 @@
+{
+    "Description": "This template will create EC2 t2.micro with details provided through user in parameters section",
+    "Parameters": {
+        "keyName": {
+            "Description": "Please select existing Key Pair for initiating EC2 instance.",
+            "Type": "AWS::EC2::KeyPair::KeyName"
+        },
+        "imageId": {
+            "Description": "Please provide Image Id for creating EC2 instance. Image Id starts with ami-",
+            "Type": "String"
+        },
+        "securityGroup": {
+            "Description": "Please select security group for the EC2 instance",
+            "Type": "AWS::EC2::SecurityGroup::Id"
+        }
+    },
+    "Resources": {
+        "Lab4EC2Instance": {
+            "Type": "AWS::EC2::Instance",
+            "Properties": {
+                "KeyName": {
+                    "Ref": "keyName"
+                },
+                "ImageId": {
+                    "Ref": "imageId"
+                },
+                "InstanceType": "t2.micro",
+                "SecurityGroupIds": [
+                    {
+                        "Ref": "securityGroup"
+                    }
+                ]
+            }
+        }
+    }
+}
