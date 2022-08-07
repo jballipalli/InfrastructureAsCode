@@ -4,4 +4,4 @@ CloudFormation will delete and terminate the resources in a order. When we proce
 
 In Resources.yaml file, every attribute of the EC2 instance are hard-coded. We have used `KeyName` attribute associated with the `Key Pair` available on one's AWS account.
 One have to change value of `KeyName` attribute to the `Key Pair` available on one's AWS account. 
-Otherwise, Then might face with `ERROR: The Key Pair 'RSA-v1kt0r' was not found in AWS region us-east-1`
+Otherwise, one might face with `ERROR: The Key Pair 'RSA-v1kt0r' was not found in AWS region us-east-1`
