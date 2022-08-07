@@ -1,0 +1,64 @@
+---
+# Author : JBallipalli
+# This .yaml file will initiate the EC2 when deployed into cloudformation.
+# We are taking few parameters to associate them with the EC2 instance.
+# One of the parameter 'selectAZ' will be used to the ImageId.
+# One option maps to amazon linux and other maps to ubuntu.
+
+Description : |
+  This template will launch EC2 instance.
+  We will collect user inputs and map them to the resources.
+  This template is valid only in AWS Region : us-east-1 N.Virginia
+
+Parameters: 
+  selectAZ : 
+    Description : | 
+      Please the Availability Zone in with instance needs to be created.
+      us-east-1a : Amazon Linux AMI (Default)
+      us-east-1b : Ubuntu linux AMI
+    Type : String
+    Default : us-east-1a
+    AllowedValues : 
+      - us-east-1a
+      - us-east-1b
+  
+  selectInstanceType :
+    Description : |
+      Please select instance type of the EC2 instance. Both instance types are eligible for Free-Tier
+      t2.micro : 1024MB memory (Default)
+      t1.micro : 612MB memory
+    Type : String
+    Default : t2.micro
+    AllowedValues : 
+      - t2.micro
+      - t1.micro
+  selectKeyPair : 
+    Description : Please select key pair to be used with EC2 instance.
+    Type : "AWS::EC2::KeyPair::KeyName"
+
+  selectSecurityGroup :
+    Description : Please select one security group for the EC2 instance.
+    Type : "AWS::EC2::SecurityGroup::GroupName"
+
+Mappings :
+  MapAZtoAMI : 
+    us-east-1a : 
+      AMI : ami-090fa75af13c156b4
+    us-east-1b :
+      AMI : ami-052efd3df9dad4825
+
+Resources :
+  MyEC2Instance : 
+    Description : This EC2 instance is created through CloudFormation template.
+    Type : "AWS::EC2::Instance"
+    Properties :
+      AvailabilityZone : !Ref selectAZ
+      KeyName : !Ref selectKeyPair
+      InstanceType : !Ref selectInstanceType
+      SecurityGroups : 
+        - !Ref selectSecurityGroup
+      ImageId : !FindInMap
+        - MapAZtoAMI
+        - !Ref selectAZ
+        - AMI
+...
