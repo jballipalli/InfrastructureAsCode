@@ -1,0 +1,81 @@
+---
+# Author : Jballipalli
+# In this document, we will launch EC2 and explore its advanced properties.
+# Parameters : selectInstanceType, selectAMI.
+# Mappings : selectAMI : {Amazon Linux 2, Ubuntu}; UserData : 'Script to install httpd / apache2 server'
+
+Mappings :
+  mapAMI :
+    AmazonLinux2 :
+      AMI : ami-090fa75af13c156b4
+
+    UbuntuServer :
+      AMI : ami-052efd3df9dad4825
+
+  mapUserData:
+    AmazonLinux2 : 
+      Data : |
+        #!/bin/bash -xe
+        sudo yum update -y
+        sudo yum install httpd
+        sudo systemctl start httpd
+        sudo systemctl enable httpd.service
+        touch AmazonLinux2.txt
+
+    UbuntuServer :
+      Data : |
+        sudo #!/bin/bash -xe
+        sudo apt update && sudo apt upgrade
+        sudo apt install apache2
+        sudo systemctl start apache2
+        sudo systemctl enable apache2.service
+        touch UbuntuServer.txt
+
+Parameters : 
+  selectInstanceType : 
+    Description : Select free-tier instance type. t2.micro (Default); t1.micro
+    AllowedValues :
+      - t2.micro
+      - t1.micro
+    Type : String
+    Default : t2.micro
+
+  selectAMI :
+    Description : Select the operating system or machine image for the instance. Amazon linux 2 or Ubuntu
+    AllowedValues : 
+      - AmazonLinux2
+      - UbuntuServer
+    Type : String
+
+  selectSecurityGroup :
+    Description : Select the one security group to attach it to the instance.
+    Type : "AWS::EC2::SecurityGroup::GroupName"
+
+  selectKeyPair :
+    Description : Select the key-pair to attach it to the EC2 instance.
+    Type : "AWS::EC2::KeyPair::KeyName" 
+
+Resources : 
+  EC2Instance : 
+    Type : AWS::EC2::Instance
+    Properties:
+      DisableApiTermination : true
+      InstanceInitiatedShutdownBehavior : terminate
+      KeyName : !Ref selectKeyPair
+      SecurityGroups : 
+        - !Ref selectSecurityGroup
+      InstanceType : !Ref selectInstanceType
+      ImageId : !FindInMap
+        - mapAMI
+        - !Ref selectAMI
+        - AMI
+      UserData :
+        Fn::Base64 : !FindInMap
+          - mapUserData
+          - !Ref selectAMI
+          - Data
+      Tags :
+        - Key : Name
+          Value : "LaunchFromCloudFormation"
+
+...
