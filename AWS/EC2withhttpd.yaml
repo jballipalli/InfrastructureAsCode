@@ -4,10 +4,12 @@
 # Parameters : selectInstanceType, selectAMI.
 # Mappings : selectAMI : {Amazon Linux 2, Ubuntu}; UserData : 'Script to install httpd / apache2 server'
 
--------TO DO --------
+#-------TO DO --------
 # Uerdata not implementing. Upon research, need to use conditions and conditional fumctions Fn::If to map userdata properly
 # Follow the proper syntax of Fn::Base64
--------END-----------
+#-------END-----------
+
+#This is test branch
 
 Mappings :
   mapAMI :
