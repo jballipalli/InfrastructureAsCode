@@ -19,7 +19,7 @@ Mappings :
     UbuntuServer :
       AMI : ami-052efd3df9dad4825
 
-  mapUserData:
+  mapUserData :
     AmazonLinux2 : 
       Data : |
         #!/bin/bash -xe
@@ -27,7 +27,7 @@ Mappings :
         sudo yum install httpd
         sudo systemctl start httpd
         sudo systemctl enable httpd.service
-        touch AmazonLinux2.txt
+        echo "User Data executed successfully and installed HTTPD" > AmazonLinux2.txt
 
     UbuntuServer :
       Data : |
@@ -36,7 +36,7 @@ Mappings :
         sudo apt install apache2
         sudo systemctl start apache2
         sudo systemctl enable apache2.service
-        touch UbuntuServer.txt
+        echo "User Data executed successfully and installed apache2" > UbuntuServer.txt
 
 Parameters : 
   selectInstanceType : 
@@ -60,7 +60,11 @@ Parameters :
 
   selectKeyPair :
     Description : Select the key-pair to attach it to the EC2 instance.
-    Type : "AWS::EC2::KeyPair::KeyName" 
+    Type : "AWS::EC2::KeyPair::KeyName"
+    
+Conditions : 
+  IsAmiUbuntu : 
+    !Equals [!Ref selectAMI, UbuntuServer]
 
 Resources : 
   EC2Instance : 
@@ -77,10 +81,9 @@ Resources :
         - !Ref selectAMI
         - AMI
       UserData :
-        Fn::Base64 : !FindInMap
-          - mapUserData
-          - !Ref selectAMI
-          - Data
+        Fn::Base64 :
+          Fn::Sub :
+            !If [IsAmiUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
       Tags :
         - Key : Name
           Value : "LaunchFromCloudFormation"
