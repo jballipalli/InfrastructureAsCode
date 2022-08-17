@@ -9,7 +9,6 @@
 # Follow the proper syntax of Fn::Base64
 #-------END-----------
 
-#This is test branch
 
 Mappings :
   mapAMI :
@@ -82,8 +81,7 @@ Resources :
         - AMI
       UserData :
         Fn::Base64 :
-          Fn::Sub :
-            !If [IsAmiUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
+          !If [IsAmiUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
       Tags :
         - Key : Name
           Value : "LaunchFromCloudFormation"
