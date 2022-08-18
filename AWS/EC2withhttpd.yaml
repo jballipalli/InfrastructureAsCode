@@ -20,22 +20,24 @@ Mappings :
 
   mapUserData :
     AmazonLinux2 : 
-      Data : |
-        #!/bin/bash -xe
-        sudo yum update -y
-        sudo yum install httpd
-        sudo systemctl start httpd
-        sudo systemctl enable httpd.service
-        echo "User Data executed successfully and installed HTTPD" > AmazonLinux2.txt
+      Data : 
+        Fn::Base64 : |
+          #!/bin/bash -xe
+          sudo yum update -y
+          sudo yum install -y httpd
+          sudo systemctl start httpd
+          sudo systemctl enable httpd.service
+          echo "User Data executed successfully and installed HTTPD" > AmazonLinux2.txt
 
     UbuntuServer :
-      Data : |
-        sudo #!/bin/bash -xe
-        sudo apt update && sudo apt upgrade
-        sudo apt install apache2
-        sudo systemctl start apache2
-        sudo systemctl enable apache2.service
-        echo "User Data executed successfully and installed apache2" > UbuntuServer.txt
+      Data : 
+        Fn::Base64 : |
+          sudo #!/bin/bash -xe
+          sudo apt update && sudo apt upgrade -y
+          sudo apt install -y apache2
+          sudo systemctl start apache2
+          sudo systemctl enable apache2.service
+          echo "User Data executed successfully and installed apache2" > UbuntuServer.txt
 
 Parameters : 
   selectInstanceType : 
@@ -80,8 +82,8 @@ Resources :
         - !Ref selectAMI
         - AMI
       UserData :
-        Fn::Base64 :
-          !If [IsAmiUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
+        !If [IsAmiUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
+
       Tags :
         - Key : Name
           Value : "LaunchFromCloudFormation"
