@@ -4,10 +4,12 @@
 # Parameters : selectInstanceType, selectAMI.
 # Mappings : selectAMI : {Amazon Linux 2, Ubuntu}; UserData : 'Script to install httpd / apache2 server'
 
--------TO DO --------
-# Uerdata not implementing. Upon research, need to use conditions and conditional fumctions Fn::If to map userdata properly
-# Follow the proper syntax of Fn::Base64
--------END-----------
+# ---------Results---------
+# AmazonLinux2 is facing has package manager issue
+# Ubuntu server is installing apache2 as expected.
+# Userdata is executing in both cases.
+# Check the userdata output by executing - sudo cat /var/log/cloud-init-output.log
+# ----------End------------
 
 Mappings :
   mapAMI :
@@ -20,7 +22,7 @@ Mappings :
   mapUserData:
     AmazonLinux2 : 
       Data : |
-        #!/bin/bash -xe
+        #!/bin/bash
         sudo yum update -y
         sudo yum install -y httpd
         sudo systemctl start httpd
@@ -29,7 +31,7 @@ Mappings :
 
     UbuntuServer :
       Data : |
-        #!/bin/bash -xe
+        #!/bin/bash
         sudo apt update && sudo apt upgrade -y
         sudo apt install -y apache2
         sudo systemctl start apache2
