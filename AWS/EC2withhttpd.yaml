@@ -86,6 +86,7 @@ Resources :
           !If [IsAmiUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
       Tags :
         - Key : Name
-          Value : "LaunchFromCloudFormation"
+          Value : 
+            !If [IsAmiUbuntu, 'LaunchFromCloudFormation-Ubuntu', 'LaunchFromCloudFormation-AmazonLinux']
 
 ...
