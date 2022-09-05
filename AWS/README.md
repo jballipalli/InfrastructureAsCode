@@ -7,3 +7,6 @@ After trying out `YAML` and `JSON`, I have decided to use `YAML` as my primary l
 In `Resources.yaml` file, every attribute of the EC2 instance are hard-coded. We have used `KeyName` attribute associated with the `Key Pair` available on one's AWS account.
 One have to change value of `KeyName` attribute to the `Key Pair` available on one's AWS account. 
 Otherwise, one might face with `ERROR: The Key Pair 'RSA-v1kt0r' was not found in AWS region us-east-1`
+
+
+For Amazon Linux 2 AMI, YUM package manager is accessing AWS YUM repository with HTTPS protocol. When using `EC2withhttpd.yaml`, make sure to provide `outbound HTTPS` permission in your security groups
