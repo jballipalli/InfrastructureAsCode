@@ -4,13 +4,9 @@
 # Parameters : selectInstanceType, selectAMI.
 # Mappings : selectAMI : {Amazon Linux 2, Ubuntu}; UserData : 'Script to install httpd / apache2 server'
 
-# ---------Results---------
-# AmazonLinux2 is facing has package manager issue
-# Ubuntu server is installing apache2 as expected.
-# Userdata is executing in both cases.
-# Check the userdata output by executing - sudo cat /var/log/cloud-init-output.log
-# For some reason, echo and touch are not getting executed but apache2 has been installed and started successfully.
-# ----------End------------
+# Yum requires HTTPS outbound access in order to install httpd.
+# So, make sure to provide Outbound HTTPS in Security Group.
+
 
 Mappings :
   mapAMI :
@@ -28,7 +24,7 @@ Mappings :
         sudo yum install -y httpd
         sudo systemctl start httpd
         sudo systemctl enable httpd.service
-        echo "User Data executed successfully and installed HTTPD" > AmazonLinux2.txt
+        echo "User Data executed successfully and installed HTTPD" > ~/AmazonLinux2.txt
 
     UbuntuServer :
       Data : |
@@ -37,7 +33,7 @@ Mappings :
         sudo apt install -y apache2
         sudo systemctl start apache2
         sudo systemctl enable apache2.service
-        echo "User Data executed successfully and installed apache2" > UbuntuServer.txt
+        echo "User Data executed successfully and installed apache2" > ~/UbuntuServer.txt
 
 Parameters : 
   selectInstanceType : 
@@ -64,7 +60,7 @@ Parameters :
     Type : "AWS::EC2::KeyPair::KeyName"
     
 Conditions : 
-  IsAmiUbuntu : 
+  AmIUbuntu : 
     !Equals [!Ref selectAMI, UbuntuServer]
 
 Resources : 
@@ -83,10 +79,10 @@ Resources :
         - AMI
       UserData :
         Fn::Base64 :
-          !If [IsAmiUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
+          !If [AmIUbuntu, !FindInMap [mapUserData, UbuntuServer, Data], !FindInMap [mapUserData, AmazonLinux2, Data]]
       Tags :
         - Key : Name
           Value : 
-            !If [IsAmiUbuntu, 'LaunchFromCloudFormation-Ubuntu', 'LaunchFromCloudFormation-AmazonLinux']
+            !If [AmIUbuntu, 'LaunchFromCloudFormation-Ubuntu', 'LaunchFromCloudFormation-AmazonLinux']
 
 ...
