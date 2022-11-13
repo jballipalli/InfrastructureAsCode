@@ -1,0 +1,70 @@
+---
+# Author: JBallipalli
+
+Description: "This cfn-template creates an Amazon Linux 2 EC2 instance installed with HTTPD using cfn-init, and CreationPolicy"
+
+Parameters: 
+  instanceType: 
+    Description: "Select the instance type from the following options"
+    Type: String
+    AllowedValues:
+      - t2.micro
+      - t1.micro
+
+  keyPair:
+    Description: "Select the key pair"
+    Type: "AWS::EC2::KeyPair::KeyName"
+
+  securityGroup:
+    Description: "Select the security group"
+    Type: "AWS::EC2::SecurityGroup::GroupName"
+
+Resources:
+  Instance:
+    Type: "AWS::EC2::Instance"
+    Properties:
+      KeyName: !Ref keyPair
+      SecurityGroups: 
+        - !Ref securityGroup
+      InstanceType: !Ref instanceType
+      ImageId: ami-090fa75af13c156b4
+      Tags:
+        - Key: Name
+          Value: "withCFN-init"
+      UserData:
+        Fn::Base64: 
+          !Sub |
+            #!/usr/bin/bash -xe
+
+            # Starting CloudFormation init function
+            /opt/aws/bin/cfn-init -s ${AWS::StackId} -r Instance --region ${AWS::Region} || error_exit "Failed to run cfn-init"
+
+            # using cfn-signal to get execution status
+            /opt/aws/bin/cfn-signal -e $? --stack ${AWS::StackId} --resource Instance --region ${AWS::Region}
+
+    Metadata:
+      Comment: "Installing HTTPD in the instance"
+      AWS::CloudFormation::Init:
+        config:
+          packages:
+            yum:
+              httpd: []
+          
+          files:
+            "/var/www/html/index.html":
+              content: |
+                <h1>Hello World from EC2 instance</h1>
+                <p>The CloudFormation template was using cfn-init, cfn-signal and CreationPolicy</p>
+              mode: "000644"
+          services:
+            sysvinit:
+              httpd:
+                enabled: 'true'
+                ensureRunning: 'true'
+    
+    CreationPolicy:
+      ResourceSignal:
+       Count: '1'
+       Timeout: PT3M
+
+...
